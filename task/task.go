@@ -57,3 +57,10 @@ type Docker struct {
 	Client *client.Client
 	Config Config
 }
+
+type DockerResult struct {
+	Error       error
+	Action      string
+	ContainerId string
+	Result      string
+}
