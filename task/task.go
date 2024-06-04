@@ -1,9 +1,14 @@
 package task
 
 import (
+	"context"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
+	"io"
+	"log"
+	"os"
 	"time"
 )
 
@@ -56,6 +61,18 @@ type Config struct {
 type Docker struct {
 	Client *client.Client
 	Config Config
+}
+
+func (d *Docker) Run() DockerResult {
+	ctx := context.Background()
+	reader, err := d.Client.ImagePull(
+		ctx, d.Config.Image, image.PullOptions{})
+	if err != nil {
+		log.Printf("Error pulling image %s: %v\n", d.Config.Image, err)
+		return DockerResult{Error: err}
+	}
+	io.Copy(os.Stdout, reader)
+	return DockerResult{}
 }
 
 type DockerResult struct {
