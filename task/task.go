@@ -5,6 +5,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/google/uuid"
 	"io"
@@ -61,8 +62,9 @@ type Config struct {
 }
 
 type Docker struct {
-	Client *client.Client
-	Config Config
+	Client      *client.Client
+	Config      Config
+	ContainerID string
 }
 
 func (d *Docker) Run() DockerResult {
@@ -109,7 +111,20 @@ func (d *Docker) Run() DockerResult {
 		return DockerResult{Error: err}
 	}
 
-	return DockerResult{}
+	d.ContainerID = resp.ID
+
+	out, err := d.Client.ContainerLogs(
+		ctx,
+		resp.ID,
+		container.LogsOptions{ShowStdout: true, ShowStderr: true},
+	)
+	if err != nil {
+		log.Printf("Error getting logs for container %s: %v\n", resp.ID, err)
+		return DockerResult{Error: err}
+	}
+
+	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	return DockerResult{ContainerId: resp.ID, Action: "start", Result: "success"}
 }
 
 type DockerResult struct {
