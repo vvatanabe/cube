@@ -9,6 +9,7 @@ import (
 	"github.com/vvatanabe/cube/node"
 	"github.com/vvatanabe/cube/task"
 	"github.com/vvatanabe/cube/worker"
+	"os"
 	"time"
 )
 
@@ -64,6 +65,17 @@ func main() {
 	}
 
 	fmt.Printf("node: %v\n", n)
+
+	fmt.Printf("create a test container\n")
+	dockerTask, createResult := createContainer()
+	if createResult.Error != nil {
+		fmt.Printf("%v", createResult.Error)
+		os.Exit(1)
+	}
+
+	time.Sleep(time.Second * 5)
+	fmt.Printf("stopping container %s\n", createResult.ContainerId)
+	_ = stopContainer(dockerTask, createResult.ContainerId)
 }
 
 func createContainer() (*task.Docker, *task.DockerResult) {
