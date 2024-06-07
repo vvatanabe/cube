@@ -57,3 +57,7 @@ func (w *Worker) StopTask(t task.Task) task.DockerResult {
 
 	return result
 }
+
+func (w *Worker) AddTask(t task.Task) {
+	w.Queue.Enqueue(t)
+}
