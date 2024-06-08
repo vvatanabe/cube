@@ -1,7 +1,9 @@
 package worker
 
 import (
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	"net/http"
 )
 
 type ErrResponse struct {
@@ -14,6 +16,11 @@ type Api struct {
 	Port    int
 	Worker  *Worker
 	Router  *chi.Mux
+}
+
+func (a *Api) Start() {
+	a.initRouter()
+	http.ListenAndServe(fmt.Sprintf("%s:%d", a.Address, a.Port), a.Router)
 }
 
 func (a *Api) initRouter() {
