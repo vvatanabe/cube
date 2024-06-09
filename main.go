@@ -7,8 +7,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/vvatanabe/cube/task"
 	"github.com/vvatanabe/cube/worker"
+	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -27,7 +29,20 @@ func main() {
 	api.Start()
 }
 
-func runTasks(w *worker.Worker) {}
+func runTasks(w *worker.Worker) {
+	for {
+		if w.Queue.Len() != 0 {
+			result := w.RunTask()
+			if result.Error != nil {
+				log.Printf("Error running task: %v\n", result.Error)
+			}
+		} else {
+			log.Printf("No tasks to process currently.\n")
+		}
+		log.Println("Sleeping for 10 seconds.")
+		time.Sleep(10 * time.Second)
+	}
+}
 
 func createContainer() (*task.Docker, *task.DockerResult) {
 	c := task.Config{
