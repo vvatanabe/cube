@@ -92,5 +92,9 @@ func (w *Worker) AddTask(t task.Task) {
 }
 
 func (w *Worker) GetTasks() []*task.Task {
-	return []*task.Task{}
+	tasks := []*task.Task{}
+	for _, t := range w.Db {
+		tasks = append(tasks, t)
+	}
+	return tasks
 }
