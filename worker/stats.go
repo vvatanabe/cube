@@ -16,3 +16,11 @@ func (s *Stats) MemTotalKb() uint64 {
 func (s *Stats) MemAvailableKb() uint64 {
 	return s.MemStats.MemAvailable
 }
+
+func (s *Stats) MemUsedKb() uint64 {
+	return s.MemStats.MemTotal - s.MemStats.MemAvailable
+}
+
+func (s *Stats) MemUsedPercent() uint64 {
+	return (s.MemStats.MemTotal - s.MemStats.MemAvailable) * 100 / s.MemStats.MemTotal
+}
