@@ -12,3 +12,7 @@ type Stats struct {
 func (s *Stats) MemTotalKb() uint64 {
 	return s.MemStats.MemTotal
 }
+
+func (s *Stats) MemAvailableKb() uint64 {
+	return s.MemStats.MemAvailable
+}
