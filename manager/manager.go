@@ -12,10 +12,29 @@ import (
 	"net/http"
 )
 
+func New(workers []string) *Manager {
+	taskDb := make(map[uuid.UUID]*task.Task)
+	eventDb := make(map[uuid.UUID]*task.TaskEvent)
+	workerTaskMap := make(map[string][]uuid.UUID)
+	taskWorkerMap := make(map[uuid.UUID]string)
+	for worker := range workers {
+		workerTaskMap[workers[worker]] = []uuid.UUID{}
+	}
+
+	return &Manager{
+		Pending:       *queue.New(),
+		Workers:       workers,
+		TaskDb:        taskDb,
+		EventDb:       eventDb,
+		WorkerTaskMap: workerTaskMap,
+		TaskWorkerMap: taskWorkerMap,
+	}
+}
+
 type Manager struct {
 	Pending       queue.Queue
-	TaskDb        map[string]*task.Task
-	EventDb       map[string]*task.TaskEvent
+	TaskDb        map[uuid.UUID]*task.Task
+	EventDb       map[uuid.UUID]*task.TaskEvent
 	Workers       []string
 	WorkerTaskMap map[string][]uuid.UUID
 	TaskWorkerMap map[uuid.UUID]string
@@ -58,19 +77,19 @@ func (m *Manager) UpdateTasks() {
 		for _, t := range tasks {
 			log.Printf("Attempting to update task %v\n", t.ID)
 
-			_, ok := m.TaskDb[t.ID.String()]
+			_, ok := m.TaskDb[t.ID]
 			if !ok {
 				log.Printf("Task with ID %s not found\n", t.ID)
 				return
 			}
 
-			if m.TaskDb[t.ID.String()].State != t.State {
-				m.TaskDb[t.ID.String()].State = t.State
+			if m.TaskDb[t.ID].State != t.State {
+				m.TaskDb[t.ID].State = t.State
 			}
 
-			m.TaskDb[t.ID.String()].StartTime = t.StartTime
-			m.TaskDb[t.ID.String()].FinishTime = t.FinishTime
-			m.TaskDb[t.ID.String()].ContainerID = t.ContainerID
+			m.TaskDb[t.ID].StartTime = t.StartTime
+			m.TaskDb[t.ID].FinishTime = t.FinishTime
+			m.TaskDb[t.ID].ContainerID = t.ContainerID
 		}
 	}
 }
@@ -84,12 +103,12 @@ func (m *Manager) SendWork() {
 		t := te.Task
 		log.Printf("Pulled %v off pending queue\n", t)
 
-		m.EventDb[te.ID.String()] = &te
+		m.EventDb[te.ID] = &te
 		m.WorkerTaskMap[w] = append(m.WorkerTaskMap[w], te.Task.ID)
 		m.TaskWorkerMap[t.ID] = w
 
 		t.State = task.Scheduled
-		m.TaskDb[t.ID.String()] = &t
+		m.TaskDb[t.ID] = &t
 
 		data, err := json.Marshal(te)
 		if err != nil {
