@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
+	"github.com/vvatanabe/cube/manager"
 	"github.com/vvatanabe/cube/task"
 	"github.com/vvatanabe/cube/worker"
 	"log"
@@ -27,6 +28,9 @@ func main() {
 	go runTasks(&w)
 	go w.CollectStats()
 	go api.Start()
+
+	workers := []string{fmt.Sprintf("%s:%d", host, port)}
+	m := manager.New(workers)
 }
 
 func runTasks(w *worker.Worker) {
