@@ -54,6 +54,24 @@ func (m *Manager) UpdateTasks() {
 		if err != nil {
 			log.Printf("Error unmarshalling tasks: %s\n", err.Error())
 		}
+
+		for _, t := range tasks {
+			log.Printf("Attempting to update task %v\n", t.ID)
+
+			_, ok := m.TaskDb[t.ID.String()]
+			if !ok {
+				log.Printf("Task with ID %s not found\n", t.ID)
+				return
+			}
+
+			if m.TaskDb[t.ID.String()].State != t.State {
+				m.TaskDb[t.ID.String()].State = t.State
+			}
+
+			m.TaskDb[t.ID.String()].StartTime = t.StartTime
+			m.TaskDb[t.ID.String()].FinishTime = t.FinishTime
+			m.TaskDb[t.ID.String()].ContainerID = t.ContainerID
+		}
 	}
 }
 
