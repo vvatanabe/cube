@@ -31,6 +31,23 @@ func main() {
 
 	workers := []string{fmt.Sprintf("%s:%d", host, port)}
 	m := manager.New(workers)
+
+	for i := 0; i < 3; i++ {
+		t := task.Task{
+			ID:    uuid.New(),
+			Name:  fmt.Sprintf("test-container-%d", i),
+			State: task.Scheduled,
+			Image: "strm/helloworld-http",
+		}
+		te := task.TaskEvent{
+			ID:    uuid.New(),
+			State: task.Running,
+			Task:  t,
+		}
+		m.AddTask(te)
+		m.SendWork()
+	}
+
 }
 
 func runTasks(w *worker.Worker) {
