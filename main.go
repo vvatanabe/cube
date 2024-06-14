@@ -47,13 +47,7 @@ func main() {
 		m.SendWork()
 	}
 
-	go func() {
-		for {
-			fmt.Printf("[Manager] Updating tasks from %d workers\n", len(m.Workers))
-			m.UpdateTasks()
-			time.Sleep(15 * time.Second)
-		}
-	}()
+	go m.UpdateTasks()
 
 	for {
 		for _, t := range m.TaskDb {
