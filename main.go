@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
+	"github.com/vvatanabe/cube/manager"
 	"github.com/vvatanabe/cube/task"
 	"github.com/vvatanabe/cube/worker"
 	"os"
@@ -27,4 +28,15 @@ func main() {
 	go w.RunTasks()
 	go w.CollectStats()
 	go wapi.Start()
+
+	fmt.Println("Starting Cube manager")
+
+	workers := []string{fmt.Sprintf("%s:%d", whost, wport)}
+	m := manager.New(workers)
+	mapi := manager.Api{Address: mhost, Port: mport, Manager: m}
+
+	go m.ProcessTasks()
+	go m.UpdateTasks()
+
+	mapi.Start()
 }
