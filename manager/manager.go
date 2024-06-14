@@ -167,3 +167,12 @@ func (m *Manager) GetTasks() []*task.Task {
 	}
 	return tasks
 }
+
+func (m *Manager) ProcessTasks() {
+	for {
+		log.Println("Processing any tasks in the queue")
+		m.SendWork()
+		log.Println("Sleeping for 10 seconds")
+		time.Sleep(10 * time.Second)
+	}
+}
