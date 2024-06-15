@@ -180,6 +180,16 @@ func (m *Manager) ProcessTasks() {
 	}
 }
 
+func (m *Manager) DoHealthChecks() {
+	for {
+		log.Println("Performing task health check")
+		m.doHealthChecks()
+		log.Println("Task health checks completed")
+		log.Println("Sleeping for 60 seconds")
+		time.Sleep(60 * time.Second)
+	}
+}
+
 func (m *Manager) checkTaskHealth(t task.Task) error {
 	log.Printf("Calling health check for task %s: %s\n", t.ID, t.HealthCheck)
 
