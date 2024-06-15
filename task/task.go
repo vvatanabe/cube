@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -175,4 +176,9 @@ type DockerResult struct {
 	Action      string
 	ContainerId string
 	Result      string
+}
+
+type DockerInspectResponse struct {
+	Error     error
+	Container *types.ContainerJSON
 }
