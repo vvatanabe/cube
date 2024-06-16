@@ -104,6 +104,7 @@ func (m *Manager) updateTasks() {
 			m.TaskDb[t.ID].StartTime = t.StartTime
 			m.TaskDb[t.ID].FinishTime = t.FinishTime
 			m.TaskDb[t.ID].ContainerID = t.ContainerID
+			m.TaskDb[t.ID].HostPorts = t.HostPorts
 		}
 	}
 }
