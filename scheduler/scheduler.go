@@ -41,3 +41,22 @@ func (r *RoundRobin) Score(t task.Task, nodes []*node.Node) map[string]float64 {
 
 	return nodeScores
 }
+
+func (r *RoundRobin) Pick(scores map[string]float64, candidates []*node.Node) *node.Node {
+	var bestNode *node.Node
+	var lowestScore float64
+	for idx, node := range candidates {
+		if idx == 0 {
+			bestNode = node
+			lowestScore = scores[node.Name]
+			continue
+		}
+
+		if scores[node.Name] < lowestScore {
+			bestNode = node
+			lowestScore = scores[node.Name]
+		}
+	}
+
+	return bestNode
+}
