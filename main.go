@@ -27,6 +27,7 @@ func main() {
 	wapi := worker.Api{Address: whost, Port: wport, Worker: &w}
 	go w.RunTasks()
 	go w.CollectStats()
+	go w.UpdateTasks()
 	go wapi.Start()
 
 	fmt.Println("Starting Cube manager")
@@ -37,6 +38,7 @@ func main() {
 
 	go m.ProcessTasks()
 	go m.UpdateTasks()
+	go m.DoHealthChecks()
 
 	mapi.Start()
 }
