@@ -5,3 +5,8 @@ type Scheduler interface {
 	Score()
 	Pick()
 }
+
+type RoundRobin struct {
+	Name       string
+	LastWorker int
+}
