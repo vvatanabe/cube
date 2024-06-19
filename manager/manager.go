@@ -18,13 +18,30 @@ import (
 	"time"
 )
 
-func New(workers []string) *Manager {
+func New(workers []string, schedulerType string) *Manager {
 	taskDb := make(map[uuid.UUID]*task.Task)
 	eventDb := make(map[uuid.UUID]*task.TaskEvent)
 	workerTaskMap := make(map[string][]uuid.UUID)
 	taskWorkerMap := make(map[uuid.UUID]string)
 	for worker := range workers {
 		workerTaskMap[workers[worker]] = []uuid.UUID{}
+	}
+
+	var nodes []*node.Node
+	for worker := range workers {
+		workerTaskMap[workers[worker]] = []uuid.UUID{}
+
+		nAPI := fmt.Sprintf("http://%v", workers[worker])
+		n := node.NewNode(workers[worker], nAPI, "worker")
+		nodes = append(nodes, n)
+	}
+
+	var s scheduler.Scheduler
+	switch schedulerType {
+	case "roundrobin":
+		s = &scheduler.RoundRobin{Name: "roundrobin"}
+	default:
+		s = &scheduler.RoundRobin{Name: "roundrobin"}
 	}
 
 	return &Manager{
@@ -34,6 +51,8 @@ func New(workers []string) *Manager {
 		EventDb:       eventDb,
 		WorkerTaskMap: workerTaskMap,
 		TaskWorkerMap: taskWorkerMap,
+		WorkerNodes:   nodes,
+		Scheduler:     s,
 	}
 }
 
