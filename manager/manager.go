@@ -134,14 +134,17 @@ func (m *Manager) updateTasks() {
 
 func (m *Manager) SendWork() {
 	if m.Pending.Len() > 0 {
-		w := m.SelectWorker()
-
 		e := m.Pending.Dequeue()
 		te := e.(task.TaskEvent)
-		t := te.Task
-		log.Printf("Pulled %v off pending queue\n", t)
-
 		m.EventDb[te.ID] = &te
+		log.Printf("Pulled %v off pending queue\n", te)
+
+		t := te.Task
+		w, err := m.SelectWorker(t)
+		if err != nil {
+			log.Printf("error selecting worker for task %s: %v\n", t.ID, err)
+		}
+
 		m.WorkerTaskMap[w] = append(m.WorkerTaskMap[w], te.Task.ID)
 		m.TaskWorkerMap[t.ID] = w
 
