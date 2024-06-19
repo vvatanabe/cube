@@ -8,6 +8,8 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
+	"github.com/vvatanabe/cube/node"
+	"github.com/vvatanabe/cube/scheduler"
 	"github.com/vvatanabe/cube/task"
 	"github.com/vvatanabe/cube/worker"
 	"log"
@@ -43,6 +45,8 @@ type Manager struct {
 	WorkerTaskMap map[string][]uuid.UUID
 	TaskWorkerMap map[uuid.UUID]string
 	LastWorker    int
+	WorkerNodes   []*node.Node
+	Scheduler     scheduler.Scheduler
 }
 
 func (m *Manager) SelectWorker() string {
