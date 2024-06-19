@@ -145,8 +145,10 @@ func (m *Manager) SendWork() {
 			log.Printf("error selecting worker for task %s: %v\n", t.ID, err)
 		}
 
-		m.WorkerTaskMap[w] = append(m.WorkerTaskMap[w], te.Task.ID)
-		m.TaskWorkerMap[t.ID] = w
+		m.WorkerTaskMap[w.Name] = append(m.WorkerTaskMap[w.Name], te.Task.ID)
+		m.TaskWorkerMap[t.ID] = w.Name
+
+		url := fmt.Sprintf("http://%s/tasks", w.Name)
 
 		t.State = task.Scheduled
 		m.TaskDb[t.ID] = &t
@@ -155,7 +157,7 @@ func (m *Manager) SendWork() {
 		if err != nil {
 			log.Printf("Unable to marshal task object: %v.\n", t)
 		}
-		url := fmt.Sprintf("http://%s/tasks", w)
+
 		resp, err := http.Post(url, "application/json", bytes.NewBuffer(data))
 		if err != nil {
 			log.Printf("Error connecting to %v: %v\n", w, err)
